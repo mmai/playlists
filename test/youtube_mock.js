@@ -5,14 +5,14 @@ var sys = require('sys');
 
 var Youtube = function() {};
 
-Youtube.prototype.search = function(searchstring){
+Youtube.prototype.search = function(track){
 
     var deferred = Q.defer();
     var songs = [
-        {title: searchstring, url: "http://youtube.com/"+searchstring, id: searchstring.substring(0,3)},
-        {title: searchstring, url: "http://youtube.com/bb", id: "bb"},
+        {title: track.title, url: "http://youtube.com/"+track.title, id: track.id},
+        {title: track.title, url: "http://youtube.com/bb", id: "bb"},
     ];
-    deferred.resolve( {songs:songs, searchstring: searchstring});
+    deferred.resolve( {songs:songs, track: track});
     return deferred.promise;
 };
 

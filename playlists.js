@@ -1,7 +1,12 @@
 var q = require('q');
 
 var Playlist = function Playlist(songs){
-    this.songs = songs;
+    this.songs = songs.map(function(song, id){
+            if (song.id === undefined){
+                song.id = id;
+            }
+            return song;
+        });
 };
 
 Playlist.prototype.toText = function(){
@@ -23,19 +28,16 @@ searchPlaylist = function searchPlaylist(initialPlaylist, searchStatusCallback){
             var playlist = [];
             var that = this;
             var searchPromises = initialPlaylist.songs.map(function(track){
-                    var title = track.name;
-                    var artist = track.artist.name;
-                    var searchstring = title + ' ' + artist;
-
-                    var searchPromise = that.search(searchstring);
+                    var searchPromise = that.search(track);
                     searchPromise.then(function(res){
                             var foundSongs = res.songs;
-                            var searchstring = res.searchstring;
+                            var searchedTrack = res.track;
+                            searchedTrack.id = track.id;
                             if (foundSongs && foundSongs.length > 0 ) {
-                                searchStatusCallback(searchstring, true);
+                                searchStatusCallback(searchedTrack, foundSongs[0]);
                                 playlist.push(foundSongs[0]);
                             } else {
-                                searchStatusCallback(searchstring, false);
+                                searchStatusCallback(searchedTrack, false);
                             }
                         }).done();
                     return searchPromise;
