@@ -15,7 +15,6 @@ Playlist.prototype.toText = function(){
         }).join("\n");
 }
 
-
 //Common musicService functions
 
 /* searchPlaylist
@@ -27,12 +26,12 @@ searchPlaylist = function searchPlaylist(initialPlaylist, searchStatusCallback){
             var deferred = q.defer();
             var playlist = [];
             var that = this;
-            var searchPromises = initialPlaylist.songs.map(function(track){
-                    var searchPromise = that.search(track);
+            var searchPromises = initialPlaylist.songs.map(function(initialTrack){
+                    var searchPromise = that.search(initialTrack);
                     searchPromise.then(function(res){
                             var foundSongs = res.songs;
                             var searchedTrack = res.track;
-                            searchedTrack.id = track.id;
+                            searchedTrack.id = initialTrack.id;
                             if (foundSongs && foundSongs.length > 0 ) {
                                 searchStatusCallback(searchedTrack, foundSongs[0]);
                                 playlist.push(foundSongs[0]);
@@ -49,10 +48,37 @@ searchPlaylist = function searchPlaylist(initialPlaylist, searchStatusCallback){
             return deferred.promise;
         };
 
+serviceRequest = function(url, callback) {
+    if (typeof(this.callbacks_store_name) !== 'undefined'){
+        //called in browser, need jsonp
+        url += '&callback=' + this.callbacks_store_name + '.' + this.getUniqueCallbackName(callback);
+        var script = document.createElement('script');
+        script.src = url;
+        document.getElementsByTagName('head')[0].appendChild(script);
+    } else {
+        //Called in node
+        callback(data);
+    }
+}
+
+getUniqueCallbackName = function(callback) {
+    that = this;
+    that.callbacks_store = eval(that.callbacks_store_name);
+    that.callbacks_store.count = that.callbacks_store.count || 0;
+
+    var name = "fn" + that.callbacks_store.count++;
+    that.callbacks_store[name] = function() {
+        callback.apply(this, arguments);
+    }
+    return name;
+}
+
 var playlists = {
     Playlist: Playlist,
     makeMusicService: function makeMusicService(bareMusicService, options){
         bareMusicService.prototype.searchPlaylist = searchPlaylist;
+        bareMusicService.prototype.serviceRequest = serviceRequest;
+        bareMusicService.prototype.getUniqueCallbackName = getUniqueCallbackName;
         return new bareMusicService(options);
     },
 }
