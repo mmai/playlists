@@ -1,7 +1,7 @@
 {
   "author": "Henri Bourcereau",
   "name": "playlists",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "licenses": {
     "type": "MIT"
   },
@@ -11,9 +11,6 @@
     "mocha": "~1.18.2"
   },
   "dependencies": {
-    "underscore": "~1.6.0",
-    "opts": "~1.2.2",
-    "lodash": "~2.4.1",
     "q": "~1.0.1"
   },
   "scripts": {
