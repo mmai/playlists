@@ -1,5 +1,5 @@
+var request;
 var q = require('q');
-var request = require('request');
 
 var Playlist = function Playlist(songs){
     this.songs = songs.map(function(song, id){
@@ -58,6 +58,7 @@ serviceRequest = function(url, callback) {
         document.getElementsByTagName('head')[0].appendChild(script);
     } else {
         //Called in node
+        request = request || require('request');
         request(url, function (err, res, body) {
                 if (err || !res || res.statusCode >= 400) {
                     err = new Error('Could not fetch url ' + url_to_fetch + ', with status ' + (res && res.statusCode) + '. Got error: ' + (err && err.message) + '.');
