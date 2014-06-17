@@ -1,5 +1,6 @@
 var request;
 var q = require('q');
+var musicServices = require('./music_services');
 
 var Playlist = function Playlist(songs){
     this.songs = songs.map(function(song, id){
@@ -83,6 +84,9 @@ getUniqueCallbackName = function(callback) {
 var playlists = {
     Playlist: Playlist,
     makeMusicService: function makeMusicService(bareMusicService, options){
+        if (typeof bareMusicService === "string"){
+            bareMusicService = musicServices[bareMusicService];
+        }
         bareMusicService.prototype.searchPlaylist = searchPlaylist;
         bareMusicService.prototype.serviceRequest = serviceRequest;
         bareMusicService.prototype.getUniqueCallbackName = getUniqueCallbackName;

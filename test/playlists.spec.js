@@ -8,11 +8,12 @@ var LastfmMock = require('./lastfm_mock');
 
 describe( 'makeMusicService', function() {
         describe('creation', function(){
-                var musicService;
-                beforeEach(function(){
-                        musicService = playlists_manager.makeMusicService(YoutubeMock);
-                    })
-                it('should create a music service object', function(){
+                it('should create a music service Object from a music service class', function(){
+                        var musicService = playlists_manager.makeMusicService(YoutubeMock);
+                        expect(musicService).instanceof(Object);
+                    });
+                it('should create a music service Object from a music service name', function(){
+                        var musicService = playlists_manager.makeMusicService("youtube", {key: "qsdf"});
                         expect(musicService).instanceof(Object);
                     });
             });
