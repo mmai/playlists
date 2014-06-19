@@ -18,8 +18,21 @@ Lastfm.prototype.getLovedTracks = function(){
       var url = 'http://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&format=json&api_key=' + that.api_key + '&user=' + that.user + '&limit=' + limit + '&page='+page_number;
 //      var url = 'mock_lastfm.js?test=test';
 //      console.log('fetching ' + url);
-      that.serviceRequest(url, function (data) {
-              if (!data.lovedtracks.track){
+
+    var makeUrl = function (callbackName){
+        if (typeof callbackName === 'undefined'){
+            //no callback name : called from node
+            return url;
+        } else {
+            //callback name provided : need JSONP
+            return url + "&callback=" + callbackName;
+        }
+    };
+
+      that.serviceRequest(makeUrl, function (err, data) {
+              if (err){
+                  deferred.reject(err);
+              } else if (!data.lovedtracks.track){
                   deferred.reject(new Error("Lastfm user '"+that.user+"' has no loved tracks"));
               } else {
                   tracks = tracks.concat( data.lovedtracks.track);

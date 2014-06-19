@@ -10,8 +10,19 @@ Soundcloud.prototype.search = function(track){
     var that = this;
     var deferred = Q.defer();
     var searchstring = track.name + " " + track.artist.name;
+    var url = "https://api.soundcloud.com/tracks.json?consumer_key=" + that.api_key + "&filter=streamable&q="+searchstring;
 
-    var callback = function (data) {
+    var makeUrl = function (callbackName){
+        if (typeof callbackName === 'undefined'){
+            //no callback name : called from node
+            return url;
+        } else {
+            //callback name provided : need JSONP
+            return url + "&callback=" + callbackName;
+        }
+    };
+
+    that.serviceRequest(makeUrl, function (err, data) {
             var songs = data.map(function(track){
                     return {
                         url: track.permalink_url,
@@ -20,11 +31,8 @@ Soundcloud.prototype.search = function(track){
                     };
                 });
             deferred.resolve({songs:songs, track: track});
-        };
-
-    var url = "https://api.soundcloud.com/tracks.json?consumer_key=" + that.api_key + "&filter=streamable&q="+searchstring;
-
-    that.serviceRequest(url, callback);
+        }
+    );
 
     return deferred.promise;
 };

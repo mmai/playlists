@@ -29,7 +29,7 @@ searchPlaylist = function searchPlaylist(initialPlaylist, searchStatusCallback){
             var playlist = [];
             var that = this;
             var searchPromises = initialPlaylist.songs.map(function(initialTrack){
-                    var searchPromise = that.search(initialTrack);
+                    var searchPromise = that.search(initialTrack)
                     searchPromise.then(function(res){
                             var foundSongs = res.songs;
                             var searchedTrack = res.track;
@@ -40,31 +40,52 @@ searchPlaylist = function searchPlaylist(initialPlaylist, searchStatusCallback){
                             } else {
                                 searchStatusCallback(searchedTrack, false);
                             }
-                        }).done();
+                        });
+                    searchPromise.catch(function(e){
+                            var searchedTrack = {
+                                id: initialTrack.id
+                            };
+                            searchStatusCallback(searchedTrack, false);
+                    });
+//                searchPromise.done();
                     return searchPromise;
                 });
 
-            q.all(searchPromises).then(function(res){
+            q.all(searchPromises).catch(function(e){
+                        console.log(e);
+                    }).done();
+
+            q.allSettled(searchPromises).then(function(res){
                     deferred.resolve(new Playlist(playlist));
                 }).done();
+
             return deferred.promise;
         };
 
-serviceRequest = function(url, callback) {
+serviceRequest = function(makeUrl, callback) {
+    
     if (typeof(this.callbacks_store_name) !== 'undefined'){
         //called in browser, need jsonp
-        url += '&callback=' + this.callbacks_store_name + '.' + this.getUniqueCallbackName(callback);
+        url = makeUrl(this.callbacks_store_name + '.' + this.getUniqueCallbackName(callback));
         var script = document.createElement('script');
         script.src = url;
         document.getElementsByTagName('head')[0].appendChild(script);
     } else {
         //Called in node
+        url = makeUrl();
         request = request || require('request');
         request(url, function (err, res, body) {
+                var songsdata;
                 if (err || !res || res.statusCode >= 400) {
-                    err = new Error('Could not fetch url ' + url_to_fetch + ', with status ' + (res && res.statusCode) + '. Got error: ' + (err && err.message) + '.');
+                    err = new Error('Could not fetch url ' + url + ', with status ' + (res && res.statusCode) + '. Got error: ' + (err && err.message) + '.');
+                } else {
+                    try {
+                        songsdata = JSON.parse(body);
+                    } catch (e) {
+                        err = e;
+                    }
                 }
-                callback(JSON.parse(body));
+                callback(err, songsdata);
             });
     }
 }
@@ -76,7 +97,11 @@ getUniqueCallbackName = function(callback) {
 
     var name = "fn" + that.callbacks_store.count++;
     that.callbacks_store[name] = function() {
-        callback.apply(this, arguments);
+        //Add a null value as the 'error' parameter to the callback
+        //to match the function signature
+        var args = [].slice.call(arguments);
+        args.unshift(null);
+        callback.apply(this, args);
     }
     return name;
 }

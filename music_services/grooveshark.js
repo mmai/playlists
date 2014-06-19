@@ -1,12 +1,12 @@
 var Q = require('q');
 
-var Youtube = function(options) {
-    this.name = "youtube";
+var Grooveshark = function(options) {
+    this.name = "grooveshark";
     this.api_key = options.key;
     this.callbacks_store_name = options.callbacks_store_name;//Required for browser
 };
 
-Youtube.prototype.search = function(track){
+Grooveshark.prototype.search = function(track){
     var that = this;
     var deferred = Q.defer();
     var searchstring = track.name + " " + track.artist.name;
@@ -14,19 +14,24 @@ Youtube.prototype.search = function(track){
 
     var callback = function (err, data) {
         var id, title, url;
-        for (itemId in data.items){
-            id = data.items[itemId].id.videoId;
-            title = data.items[itemId].snippet.title;
+        var item;
+        if (err){
+            deferred.reject(err);
+        }
+        for (itemId in data){
+            song = data[itemId];
+            id = song.SongId;
+            title = song.SongName;
             songs.push({
                     id: track.id,
-                    url: "http://www.youtube.com/watch?v=" + id,
-                    title: title
+                    url: song.Url,
+                    title: song.SongName
                 });
         }
         deferred.resolve( {songs:songs, track: track});
     };
 
-    var url = "https://www.googleapis.com/youtube/v3/search?part=snippet&key=" + that.api_key + "&q="+escape(searchstring);
+    var url = "http://tinysong.com/s/" + escape(searchstring) + "?format=json&limit=3&key=" + that.api_key;
 
     var makeUrl = function (callbackName){
         if (typeof callbackName === 'undefined'){
@@ -34,7 +39,7 @@ Youtube.prototype.search = function(track){
             return url;
         } else {
             //callback name provided : need JSONP
-            return url + "&callback=" + callbackName;
+            throw new Error("Grooveshark does not provide JSONP");
         }
     };
 
@@ -43,4 +48,4 @@ Youtube.prototype.search = function(track){
     return deferred.promise;
 };
 
-module.exports = Youtube;
+module.exports = Grooveshark;
