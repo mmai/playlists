@@ -10,7 +10,7 @@ Soundcloud.prototype.search = function(track){
     var that = this;
     var deferred = Q.defer();
     var searchstring = track.name + " " + track.artist.name;
-    var url = "https://api.soundcloud.com/tracks.json?consumer_key=" + that.api_key + "&filter=streamable&q="+searchstring;
+    var url = "https://api.soundcloud.com/tracks.json?consumer_key=" + that.api_key + "&filter=streamable&q="+escape(searchstring);
 
     var makeUrl = function (callbackName){
         if (typeof callbackName === 'undefined'){

@@ -12,7 +12,7 @@ describe('Soundcloud', function(){
 
         describe('search', function(){
                 it('should return a list of found songs', function(done){
-                        var track = {title: "where is my mind", artist:{name: "Pixies"}};
+                        var track = {name: "where is my mind", artist:{name: "Pixies"}};
                         soundcloud.search(track).then(function(searchResult){
                                 expect(searchResult).to.not.be.null;
                                 expect(searchResult.songs).to.have.length.above(0);
