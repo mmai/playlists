@@ -3,11 +3,12 @@ var expect = chai.expect;
 
 var Soundcloud = require("../music_services/soundcloud");
 var playlists = require('..');
+var settings = require("../settings");
 
 describe('Soundcloud', function(){
         var soundcloud;
         beforeEach(function(){
-                soundcloud = playlists.makeMusicService(Soundcloud, {key: 'TiNg2DRYhBnp01DA3zNag'});
+                soundcloud = playlists.makeMusicService(Soundcloud, settings.soundcloud);
             });
 
         describe('search', function(){

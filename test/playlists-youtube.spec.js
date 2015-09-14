@@ -3,11 +3,12 @@ var expect = chai.expect;
 
 var Youtube = require("../music_services/youtube");
 var playlists = require('..');
+var settings = require("../settings");
 
 describe('Youtube', function(){
         var youtube;
         beforeEach(function(){
-                youtube = playlists.makeMusicService(Youtube, {key: 'AIzaSyB1OG8q7t-tuVYfL6qVw9GZ-cvjO56X2j0'});
+                youtube = playlists.makeMusicService(Youtube, settings.youtube);
         });
 
         describe('search', function(){

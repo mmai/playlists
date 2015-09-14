@@ -3,11 +3,12 @@ var expect = chai.expect;
 
 var Lastfm = require("../music_services/lastfm");
 var playlists = require('..');
+var settings = require("../settings");
 
 describe('Lastfm', function(){
         var lastfm;
         beforeEach(function(){
-                lastfm = playlists.makeMusicService(Lastfm, {key: '1e049e903004205189901533570d81b1', user: 'mmai'});
+                lastfm = playlists.makeMusicService(Lastfm, settings.lastfm);
             });
 
         describe('getLovedTracks', function(){
