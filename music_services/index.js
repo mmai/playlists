@@ -1,4 +1,5 @@
 module.exports = {
+    filesystem: require('./filesystem'),
     youtube: require('./youtube'),
     lastfm: require('./lastfm'),
     gmusic: require('./gmusic'),
